@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booked Appointments</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="p-4 bg-light">
+
+<h2 class="mb-4">📋 Booked Appointments</h2>
+
+{% if appointments %}
+<table class="table table-bordered table-striped bg-white">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Booked At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for appt in appointments %}
+        <tr>
+            <td>{{ appt["name"] }}</td>
+            <td>{{ appt["email"] }}</td>
+            <td>{{ appt["department"] }}</td>
+            <td>{{ appt["date"] }}</td>
+            <td>{{ appt["time"] }}</td>
+            <td>{{ appt["created_at"] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">No appointments found.</p>
+{% endif %}
+
+<a href="/dashboard" class="btn btn-secondary mt-3">⬅ Back to Dashboard</a>
+
+</body>
+</html>

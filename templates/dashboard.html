@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Threpsi Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f1f5f9;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      height: 100vh;
+      background-color: #0f172a;
+      color: white;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      padding: 12px 15px;
+      display: block;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      transition: 0.2s;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #1e293b;
+      font-weight: 600;
+    }
+
+    .logo {
+      width: 140px;
+      margin: 20px auto 30px;
+      display: block;
+    }
+
+    /* Topbar */
+    .topbar {
+      background-color: #ffffff;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* Dashboard cards */
+    .feature-card {
+      background-color: white;
+      border-radius: 14px;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 35px rgba(0,0,0,0.12);
+    }
+
+    .feature-icon {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-md-2 sidebar p-3">
+      <img src="/static/threpsi-logo.png" class="logo" alt="Threpsi">
+
+      <a href="/dashboard" class="active">🏠 Dashboard</a>
+      <a href="/appointments">📋 My Appointments</a>
+      <a href="/doctor">🩺 Book Appointment</a>
+
+      <hr class="text-secondary">
+
+      <a href="https://www.1mg.com" target="_blank">🛒 Medical Store</a>
+      <a href="https://www.practo.com/consult" target="_blank">👨‍⚕️ Consult Doctor</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-10 p-0">
+
+      <!-- Topbar -->
+      <div class="topbar d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">👋 Welcome to Threpsi</h5>
+        <a href="/" class="btn btn-outline-danger btn-sm">Logout</a>
+      </div>
+
+      <!-- Dashboard Body -->
+      <div class="container py-5">
+
+        <h3 class="section-title">Health Services</h3>
+
+        <div class="row g-4">
+
+          <!-- AI Medicine Tool -->
+          <div class="col-md-4">
+            <a href="http://localhost:8501" target="_blank" class="text-decoration-none text-dark">
+              <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-title">AI Medicine Assistant</div>
+                <div class="feature-desc">
+                  Analyze prescriptions, lab reports, symptoms & food images using AI
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Book Appointment -->
+          <div class="col-md-4">
+            <a href="/doctor" class="text-decoration-none text-dark">
+              <div class="feature-card">
+                <div class="feature-icon">🩺</div>
+                <div class="feature-title">Book Doctor Appointment</div>
+                <div class="feature-desc">
+                  Schedule appointments with departments in one click
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- View Appointments -->
+          <div class="col-md-4">
+            <a href="/appointments" class="text-decoration-none text-dark">
+              <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <div class="feature-title">My Appointments</div>
+                <div class="feature-desc">
+                  View and manage all your booked appointments
+                </div>
+              </div>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Secondary Row -->
+        <div class="row g-4 mt-4">
+
+          <!-- External Store -->
+          <div class="col-md-4">
+            <a href="https://www.1mg.com" target="_blank" class="text-decoration-none text-dark">
+              <div class="feature-card">
+                <div class="feature-icon">🛒</div>
+                <div class="feature-title">Online Medical Store</div>
+                <div class="feature-desc">
+                  Buy medicines from trusted pharmacies
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Consult Doctor -->
+          <div class="col-md-4">
+            <a href="https://www.practo.com/consult" target="_blank" class="text-decoration-none text-dark">
+              <div class="feature-card">
+                <div class="feature-icon">👨‍⚕️</div>
+                <div class="feature-title">Online Doctor Consultation</div>
+                <div class="feature-desc">
+                  Talk to verified doctors online instantly
+                </div>
+              </div>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
