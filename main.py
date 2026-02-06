@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-# STARTUP (DB ONLY – SAFE FOR RENDER)
+# STARTUP (DB ONLY)
 
 @app.on_event("startup")
 def startup_tasks():
@@ -194,3 +194,4 @@ async def compare_price(brand: str = Form(...), generic: str = Form(...)):
         <p>Generic: <a href="{generic_link}" target="_blank">{generic}</a></p>
         <a href="/dashboard">Back</a>
     """)
+
