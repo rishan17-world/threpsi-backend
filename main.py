@@ -1,9 +1,4 @@
 import os
-import requests
-import subprocess
-import socket
-import sys
-from bs4 import BeautifulSoup
 from datetime import datetime
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
@@ -14,50 +9,29 @@ from fastapi.staticfiles import StaticFiles
 # ✅ DATABASE
 from db import get_connection, init_db
 
-# ----------------------------------
 # APP INIT
-# ----------------------------------
+
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ----------------------------------
-# STREAMLIT AUTO-LAUNCH (ONE CLICK AI)
-# ----------------------------------
-def is_port_open(port):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(("localhost", port)) == 0
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-def start_streamlit():
-    if not is_port_open(8501):
-        streamlit_app_path = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "Streamlit_apps", "app.py")
-        )
-
-        subprocess.Popen(
-            [
-                sys.executable,
-                "-m",
-                "streamlit",
-                "run",
-                streamlit_app_path,
-                "--server.port",
-                "8501",
-                "--server.headless",
-                "true"
-            ],
-            creationflags=subprocess.CREATE_NEW_CONSOLE
-        )
+# STARTUP (DB ONLY – SAFE FOR RENDER)
 
 @app.on_event("startup")
 def startup_tasks():
     init_db()
-    start_streamlit()
 
-# ----------------------------------
+# ERROR HANDLER
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    return PlainTextResponse("Invalid or missing form data.", status_code=400)
+
 # USER HELPERS (SQLITE)
-# ----------------------------------
+
 def user_exists(username):
     conn = get_connection()
     cur = conn.cursor()
@@ -78,7 +52,10 @@ def save_user(username, email, password):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, ?)",
+        """
+        INSERT INTO users (username, email, password, created_at)
+        VALUES (?, ?, ?, ?)
+        """,
         (username, email, password, datetime.now())
     )
     conn.commit()
@@ -95,25 +72,8 @@ def validate_user(username, password):
     conn.close()
     return valid
 
-# ----------------------------------
-# MEDICINE PRICE (SAFE REDIRECT)
-# ----------------------------------
-def get_medicine_price(medicine_name):
-    return {
-        "price": "Check Live",
-        "link": f"https://www.1mg.com/search/all?name={medicine_name.replace(' ', '%20')}"
-    }
-
-# ----------------------------------
-# ERROR HANDLER
-# ----------------------------------
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
-    return PlainTextResponse("Invalid or missing form data.", status_code=400)
-
-# ----------------------------------
 # AUTH ROUTES
-# ----------------------------------
+
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
@@ -142,16 +102,16 @@ async def register_user(
     save_user(username, email, password)
     return HTMLResponse("<h3>✅ Registration successful</h3><a href='/'>Login</a>")
 
-# ----------------------------------
+
 # DASHBOARD
-# ----------------------------------
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
-# ----------------------------------
+
 # DOCTOR APPOINTMENT
-# ----------------------------------
+
 @app.get("/doctor", response_class=HTMLResponse)
 async def doctor_page(request: Request):
     return templates.TemplateResponse("doctor.html", {"request": request})
@@ -166,11 +126,14 @@ async def submit_appointment(
 ):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO appointments
         (name, email, department, date, time, created_at)
         VALUES (?, ?, ?, ?, ?, ?)
-    """, (name, email, department, date, time, datetime.now()))
+        """,
+        (name, email, department, date, time, datetime.now())
+    )
     conn.commit()
     conn.close()
 
@@ -179,18 +142,20 @@ async def submit_appointment(
         <a href="/dashboard">Back to Dashboard</a>
     """)
 
-# ----------------------------------
+
 # VIEW APPOINTMENTS
-# ----------------------------------
+
 @app.get("/appointments", response_class=HTMLResponse)
 async def view_appointments(request: Request):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT name, email, department, date, time, created_at
         FROM appointments
         ORDER BY created_at DESC
-    """)
+        """
+    )
     rows = cur.fetchall()
     conn.close()
 
@@ -211,21 +176,21 @@ async def view_appointments(request: Request):
         {"request": request, "appointments": appointments}
     )
 
-# ----------------------------------
-# MEDICINE PRICE
-# ----------------------------------
+
+# MEDICINE PRICE (SAFE REDIRECT)
+
 @app.get("/medicine-price", response_class=HTMLResponse)
 async def medicine_price_form(request: Request):
     return templates.TemplateResponse("medicine_price.html", {"request": request})
 
 @app.post("/medicine-price", response_class=HTMLResponse)
 async def compare_price(brand: str = Form(...), generic: str = Form(...)):
-    brand_info = get_medicine_price(brand)
-    generic_info = get_medicine_price(generic)
+    brand_link = f"https://www.1mg.com/search/all?name={brand.replace(' ', '%20')}"
+    generic_link = f"https://www.1mg.com/search/all?name={generic.replace(' ', '%20')}"
 
     return HTMLResponse(f"""
         <h2>💊 Medicine Price Comparison</h2>
-        <p>Brand: <a href="{brand_info['link']}" target="_blank">{brand}</a> — {brand_info['price']}</p>
-        <p>Generic: <a href="{generic_info['link']}" target="_blank">{generic}</a> — {generic_info['price']}</p>
+        <p>Brand: <a href="{brand_link}" target="_blank">{brand}</a></p>
+        <p>Generic: <a href="{generic_link}" target="_blank">{generic}</a></p>
         <a href="/dashboard">Back</a>
     """)
